@@ -1,5 +1,5 @@
 FROM centos:latest
-LABEL maintainer=devops
+LABEL maintainer=Bruce.Lu
 LABEL version=0.1
 LABEL description=PHP-image
 LABEL name=centos-php
