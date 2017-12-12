@@ -134,7 +134,7 @@ RUN cd /usr/local/php/etc && \
     cd scws-1.2.2/phpext/ && \
 	/usr/local/php/bin/phpize && \
 	./configure --with-php-config=/usr/local/php/bin/php-config --with-scws=/usr/local/scws && \
-	make -j4 && make 
+	make -j4 && make install
 
 # nginx build
 RUN yum install -y gd-devel gd && \
@@ -274,6 +274,6 @@ COPY ./php-fpm.conf /usr/local/php/etc/
 #COPY ./app /app/webroot
 COPY ./test.php /app/webroot/test.php
 RUN chown -R www /app
-CMD ["/bin/sh", "-c", "nginx && /usr/local/php/sbin/php-fpm"]
+CMD ["/bin/sh", "-c", "/usr/local/nginx/sbin/nginx && /usr/local/php/sbin/php-fpm"]
 EXPOSE 80
 #EXPOSE 443 9000
