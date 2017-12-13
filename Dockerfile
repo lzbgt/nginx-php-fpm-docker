@@ -92,8 +92,8 @@ RUN yum update -y && \
         --with-config-file-path=/usr/local/php/etc \
         --with-mssql=/usr/local/freetds \
         --with-iconv=/usr/local/libiconv && \
-    make -j4 ZEND_EXTRA_LIBS='-liconv' && make install
-RUN cd /usr/local/php/etc && \
+    make -j4 ZEND_EXTRA_LIBS='-liconv' && make install && \
+    cd /usr/local/php/etc && \
     cp php-fpm.conf.default php-fpm.conf && \
     cp /usr/local/src/php-5.6.15/php.ini-production php.ini && \
     mkdir -p /home/logs/php/ && \
@@ -135,10 +135,8 @@ RUN cd /usr/local/php/etc && \
     cd scws-1.2.2/phpext/ && \
 	/usr/local/php/bin/phpize && \
 	./configure --with-php-config=/usr/local/php/bin/php-config --with-scws=/usr/local/scws && \
-	make -j4 && make install
-
-# nginx build
-RUN yum install -y gd-devel gd && \
+	make -j4 && make install && \
+    yum install -y gd-devel gd && \
     cd /usr/local/src && \
     wget http://yum.dfwsgroup.com/source/nginx/libfastcommon-master.zip && \
     unzip libfastcommon-master.zip && \
@@ -207,8 +205,8 @@ RUN yum install -y gd-devel gd && \
     wget http://yum.dfwsgroup.com/source/nginx/nginx_lua_module-master.zip && \
     unzip nginx_lua_module-master.zip && \
     wget http://yum.dfwsgroup.com/source/nginx/nginx_mod_h264_streaming-2.2.7.tar.gz && \
-    tar -zxvf nginx_mod_h264_streaming-2.2.7.tar.gz
-RUN cd /usr/local/src/ && \
+    tar -zxvf nginx_mod_h264_streaming-2.2.7.tar.gz && \
+    cd /usr/local/src/ && \
     wget http://tengine.taobao.org/download/tengine-2.1.2.tar.gz && \
     tar -zxvf tengine-2.1.2.tar.gz  && \
     cd /usr/local/src/tengine-2.1.2 && \
@@ -259,13 +257,12 @@ RUN cd /usr/local/src/ && \
     --with-http_random_index_module \
     --with-http_sub_module=shared \
     --with-http_dav_module && \
-    make -j1 && make install
-# clean packages and files
-RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" && \
+    make -j1 && make install && \
+    curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" && \
     python get-pip.py && \
     pip install supervisor && \
-    rm -fr pip.py && \
-    yum remove -y gcc gcc-c++ autoconf && \
+    rm -fr get-pip.py && \
+    yum remove -y gcc gcc-c++ autoconf file zip unzip gd gd-devel libtool file zip unzip wget gcc gcc-c++ autoconf libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libxml2 libxml2-devel zlib zlib-devel glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel curl curl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers pcre-devel libmcrypt libmcrypt-devel libiconv && \
     yum autoremove -y && \
     yum clean all  && \
     rm -fr /usr/local/src
@@ -281,3 +278,4 @@ RUN chown -R www /app
 CMD ["supervisord", "-c", "/etc/supervisord.conf", "-n"]
 EXPOSE 80
 #EXPOSE 443 9000
+
