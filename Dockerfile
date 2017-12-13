@@ -3,8 +3,6 @@ LABEL maintainer=Bruce.Lu
 LABEL version=0.1
 LABEL description=PHP-image
 LABEL name=nginx-php-fpm
-ENV http_proxy http://node1:19821
-ENV http_proxy http://node1:19821
 
 # php build
 COPY ./CentOS7-Base.repo /etc/yum.repos.d/CentOS-Base.repo

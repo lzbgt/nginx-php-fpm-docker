@@ -3,7 +3,7 @@ LABEL maintainer=Bruce.Lu
 LABEL version=0.1
 LABEL name=manage-9first
 ENV user=lzbgt
-ENV pass=passwd
+ENV pass=pass
 WORKDIR /
 RUN echo "machine gitee.com lzbgt password " > ~/.netrc
 RUN rm -fr /app && \
