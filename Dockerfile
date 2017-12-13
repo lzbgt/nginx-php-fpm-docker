@@ -2,11 +2,14 @@ FROM centos:latest
 LABEL maintainer=Bruce.Lu
 LABEL version=0.1
 LABEL description=PHP-image
-LABEL name=centos-php
+LABEL name=nginx-php-fpm
+ENV http_proxy http://node1:19821
+ENV http_proxy http://node1:19821
+
 # php build
 COPY ./CentOS7-Base.repo /etc/yum.repos.d/CentOS-Base.repo
 RUN yum update -y && \
-    yum -y install libtool file zip unzip wget gcc gcc-c++ autoconf libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libxml2 libxml2-devel zlib zlib-devel glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel curl curl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers pcre-devel libmcrypt libmcrypt-devel libiconv && \
+    yum -y install git libtool file zip unzip wget gcc gcc-c++ autoconf libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libxml2 libxml2-devel zlib zlib-devel glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel curl curl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers pcre-devel libmcrypt libmcrypt-devel libiconv && \
     cd /usr/local/src && \
     wget http://yum.dfwsgroup.com/source/php/freetds-0.95.95.tar.gz && \
     tar xvf freetds-0.95.95.tar.gz && \
@@ -259,21 +262,24 @@ RUN cd /usr/local/src/ && \
     --with-http_sub_module=shared \
     --with-http_dav_module && \
     make -j1 && make install
-RUN yum install git -y   
 # clean packages and files
-RUN yum remove -y gcc gcc-c++ autoconf && \
-    yum autoremove -y &&  rm -fr /usr/local/src
+RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" && \
+    python get-pip.py && \
+    pip install supervisor && \
+    rm -fr pip.py && \
+    yum remove -y gcc gcc-c++ autoconf && \
+    yum autoremove -y && \
+    yum clean all  && \
+    rm -fr /usr/local/src
+
 WORKDIR /
-# pull php app common libs
-#RUN git pull --depth 1 https://gitee.com/xianzhi9first/communal.git && \
-#    git pull --depth 1 https://gitee.com/xianzhi9first/vendor.git 
- 
 COPY ./nginx.conf /usr/local/nginx/conf/nginx.conf
 COPY ./php.ini /usr/local/php/etc/
 COPY ./php-fpm.conf /usr/local/php/etc/
-#COPY ./app /app/webroot
 COPY ./test.php /app/webroot/test.php
+COPY ./supervisord.conf /etc/supervisord.conf
 RUN chown -R www /app
-CMD ["/bin/sh", "-c", "/usr/local/nginx/sbin/nginx && /usr/local/php/sbin/php-fpm"]
+
+CMD ["supervisord", "-c", "/etc/supervisord.conf", "-n"]
 EXPOSE 80
 #EXPOSE 443 9000
