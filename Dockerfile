@@ -4,6 +4,9 @@ LABEL version=0.1
 LABEL description=PHP-image
 LABEL name=nginx-php-fpm
 
+#ENV http_proxy http://node1:19821
+#ENV https_proxy http://node1:19821
+
 # php build
 COPY ./CentOS7-Base.repo /etc/yum.repos.d/CentOS-Base.repo
 RUN yum update -y && \
@@ -96,7 +99,7 @@ RUN yum update -y && \
     cd /usr/local/php/etc && \
     cp php-fpm.conf.default php-fpm.conf && \
     cp /usr/local/src/php-5.6.15/php.ini-production php.ini && \
-    mkdir -p /home/logs/php/ && \
+    mkdir -p /logs && \
 	cd /usr/local/src && \
 	wget http://yum.dfwsgroup.com/source/libmemcached-1.0.18.tar.gz && \
 	tar xvf libmemcached-1.0.18.tar.gz && \
@@ -159,7 +162,6 @@ RUN yum update -y && \
     echo "/usr/local/lib" >>  /etc/ld.so.conf && \
     echo "/usr/local/lib64" >>  /etc/ld.so.conf && \
     /sbin/ldconfig && \
-    mkdir -p /home/log/nginx/ && \
     mkdir -p /var/nginx_temp/{nginx_client,nginx_proxy,nginx_fastcgi && \
     ln -s /usr/include/fastdfs/*.h /usr/include && \
     ln -s /usr/include/fastcommon/*.h /usr/include && \
@@ -216,8 +218,8 @@ RUN yum update -y && \
     ./configure --prefix=/usr/local/nginx \
     --lock-path=/var/lock/nginx.lock \
     --pid-path=/var/run/nginx.pid \
-    --error-log-path=/home/log/nginx/error.log \
-    --http-log-path=/home/log/nginx/access.log \
+    --error-log-path=/logs/nginx_error.log \
+    --http-log-path=/logs/nginx_access.log \
     --with-pcre=../pcre-8.36 \
     --with-pcre-opt=-fPIC \
     --with-openssl=../openssl-1.0.1m \
@@ -262,10 +264,10 @@ RUN yum update -y && \
     python get-pip.py && \
     pip install supervisor && \
     rm -fr get-pip.py && \
-    yum remove -y gcc gcc-c++ autoconf file zip unzip gd gd-devel libtool file zip unzip wget gcc gcc-c++ autoconf libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libxml2 libxml2-devel zlib zlib-devel glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel curl curl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers pcre-devel libmcrypt libmcrypt-devel libiconv && \
-    yum autoremove -y && \
+    yum autoremove -y gcc gcc-c++ autoconf file zip unzip gd-devel libtool wget libjpeg-devel libpng-devel freetype-devel libxml2-devel zlib-devel  glibc-devel glib2-devel bzip2 bzip2-devel ncurses-devel curl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn-devel openssl-devel openldap-devel openldap-clients openldap-servers pcre-devel libmcrypt libmcrypt-devel && \
     yum clean all  && \
-    rm -fr /usr/local/src
+    rm -fr /usr/local/src && \
+    rm -fr /var/*
 
 WORKDIR /
 COPY ./nginx.conf /usr/local/nginx/conf/nginx.conf
@@ -273,9 +275,10 @@ COPY ./php.ini /usr/local/php/etc/
 COPY ./php-fpm.conf /usr/local/php/etc/
 COPY ./test.php /app/webroot/test.php
 COPY ./supervisord.conf /etc/supervisord.conf
-RUN chown -R www /app
-
+RUN  mkdir -p /var/{nginx_temp,run} /logs && \
+     chown -R www /logs /var/{nginx_temp,run}
+#ENV http_proxy ''
+#ENV https_proxy ''
 CMD ["supervisord", "-c", "/etc/supervisord.conf", "-n"]
 EXPOSE 80
 #EXPOSE 443 9000
-
