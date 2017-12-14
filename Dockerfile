@@ -4,9 +4,6 @@ LABEL version=0.1
 LABEL description=PHP-image
 LABEL name=nginx-php-fpm
 
-#ENV http_proxy http://node1:19821
-#ENV https_proxy http://node1:19821
-
 # php build
 COPY ./CentOS7-Base.repo /etc/yum.repos.d/CentOS-Base.repo
 RUN yum update -y && \
@@ -277,8 +274,7 @@ COPY ./test.php /app/webroot/test.php
 COPY ./supervisord.conf /etc/supervisord.conf
 RUN  mkdir -p /var/{nginx_temp,run} /logs && \
      chown -R www /logs /var/{nginx_temp,run}
-#ENV http_proxy ''
-#ENV https_proxy ''
+
 CMD ["supervisord", "-c", "/etc/supervisord.conf", "-n"]
 EXPOSE 80
 #EXPOSE 443 9000

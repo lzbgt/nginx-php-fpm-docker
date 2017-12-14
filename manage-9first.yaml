@@ -1,0 +1,48 @@
+# manage-9first cluster
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: manage-9first
+  labels:
+    app: manage-9first
+spec:
+  selector:
+    app: manage-9first
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    nodePort: 30166
+  type: NodePort
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: manage-9first
+  labels:
+    app: manage-9first
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: manage-9first
+  template:
+    metadata:
+      labels:
+        app: manage-9first
+    spec:
+      containers:
+      - name: manage-9first
+        image: node1:30400/manage-9first:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        #resources:
+        #  requests:
+        #    memory: "64Mi"
+        #    cpu: "400m"
+        #  limits:
+        #    memory: "256Mi"
+        #    cpu: "500m"
+
