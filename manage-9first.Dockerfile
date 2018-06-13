@@ -1,4 +1,4 @@
-FROM docker-registry.dfwsgroup.cn/library/nginx-php-fpm:latest
+FROM docker-registry.cluster.dfwsgroup.cn/library/nginx-php-fpm:latest
 LABEL maintainer=Bruce.Lu
 LABEL version=0.1
 LABEL name=manage-9first
