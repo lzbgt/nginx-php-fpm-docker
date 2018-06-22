@@ -3,7 +3,7 @@ LABEL maintainer=Bruce.Lu
 LABEL version=0.2
 LABEL name=manage-9first
 ENV user=lzbgt
-ENV pass=Hz123456
+ENV pass=pass
 WORKDIR /
 COPY ./nginx.conf /usr/local/nginx/conf/nginx.conf
 #COPY ./php.ini /usr/local/php/etc/
